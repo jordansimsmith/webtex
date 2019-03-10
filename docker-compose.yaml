@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  webtex-service:
+    container_name: webtex
+    build: .
+    volumes:
+      - .:/app
