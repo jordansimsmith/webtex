@@ -1,5 +1,6 @@
 import requests
 from readability import Document
+from bs4 import BeautifulSoup
 
 
 def get_page_contents(url):
@@ -18,12 +19,25 @@ def clean_page(page):
     # parse text into readability document
     doc = Document(page)
 
-    # return cleaned text
-    return doc.summary()
+    # return cleaned content
+    return doc
+
+
+def parse_content(content):
+    # parse text using beautiful soup
+    soup = BeautifulSoup(content, features='lxml')
+
+    # return soup object
+    return soup
+
+
+def format_latex(title, content):
+    pass
 
 
 url = 'https://www.jpattonassociates.com/dual-track-development/'
 raw_content = get_page_contents(url)
 cleaned_content = clean_page(raw_content)
+soup = parse_content(cleaned_content.summary())
 
-print(cleaned_content)
+print(soup.prettify())
