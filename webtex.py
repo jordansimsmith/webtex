@@ -1,9 +1,10 @@
+from bs4 import BeautifulSoup
+from pylatex.utils import NoEscape
 import requests
 import pathlib
 from readability import Document as ReadabilityDocument
 from pylatex import Document, Section, Subsection, Subsubsection, Command
-from pylatex.utils import NoEscape
-from bs4 import BeautifulSoup
+from pylatex.section import Paragraph, Subparagraph
 
 
 def get_page_contents(url):
@@ -47,11 +48,18 @@ def format_latex(title, soup):
 
     # iterate over elements
     for ele in main_content.find_all(True):
-        if ele.name == "h1":
+        if ele.name == 'h1':
             doc.append(Section(ele.text))
-        elif ele.name == "h2":
-            print(ele.text)
+        elif ele.name == 'h2':
             doc.append(Subsection(ele.text))
+        elif ele.name == 'h3':
+            doc.append(Subsubsection(ele.text))
+        elif ele.name == 'h4':
+            doc.append(Paragraph(ele.text))
+        elif ele.name == 'h5':
+            doc.append(Subparagraph(ele.text))
+        elif ele.name == 'p':
+            doc.append(ele.text + '\n')
 
     return doc
 
@@ -61,7 +69,7 @@ def build_latex(title, latex):
     pathlib.Path('build').mkdir(exist_ok=True)
 
     # generate file name
-    file_name = title.replace(" ", "-").lower()
+    file_name = title.replace(' ', '-').lower()
 
     # generate tex and pdf files
     latex.generate_pdf('build/' + file_name, clean_tex=False)
