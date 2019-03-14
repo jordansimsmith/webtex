@@ -81,6 +81,7 @@ def format_latex(title, soup):
                 image_path = 'images/' + ele['src'].split('/')[-1]
 
                 # retrieve image
+                print('downloading image ' + ele['src'])
                 headers = {'User-Agent': USER_AGENT}
                 response = requests.get(ele['src'], stream=True,
                                         headers=headers)
@@ -102,6 +103,7 @@ def build_latex(title, latex):
     file_name = title.replace(' ', '-').lower()
 
     # generate tex and pdf files
+    print('compiling latex')
     latex.generate_pdf('build/' + file_name, clean_tex=False)
 
 
