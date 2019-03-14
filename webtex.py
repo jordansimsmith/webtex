@@ -3,7 +3,7 @@ from pylatex.utils import NoEscape
 import requests
 import pathlib
 from readability import Document as ReadabilityDocument
-from pylatex import Document, Section, Subsection, Subsubsection, Command
+from pylatex import Document, Section, Subsection, Subsubsection, Command, Itemize, Enumerate
 from pylatex.section import Paragraph, Subparagraph
 
 
@@ -45,9 +45,10 @@ def format_latex(title, soup):
 
     # get the main content body
     main_content = soup.body.find('div').find('div')
+    elements = main_content.find_all(True)
 
     # iterate over elements
-    for ele in main_content.find_all(True):
+    for ele in elements:
         if ele.name == 'h1':
             doc.append(Section(ele.text))
         elif ele.name == 'h2':
@@ -60,6 +61,14 @@ def format_latex(title, soup):
             doc.append(Subparagraph(ele.text))
         elif ele.name == 'p':
             doc.append(ele.text + '\n')
+        elif ele.name == 'ul':
+            with doc.create(Itemize()) as item:
+                for li in ele.find_all('li'):
+                    item.add_item(li.text)
+        elif ele.name == 'ol':
+            with doc.create(Enumerate()) as enum:
+                for li in ele.find_all('li'):
+                    enum.add_item(li.text)
 
     return doc
 
