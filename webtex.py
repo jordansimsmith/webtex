@@ -2,15 +2,18 @@ from bs4 import BeautifulSoup
 from pylatex.utils import NoEscape
 import requests
 import pathlib
+import shutil
 from readability import Document as ReadabilityDocument
-from pylatex import Document, Section, Subsection, Subsubsection, Command, Itemize, Enumerate
+from pylatex import Document, Section, Subsection, Subsubsection, Command, Itemize, Enumerate, Figure
 from pylatex.section import Paragraph, Subparagraph
+
+
+USER_AGENT = 'Mozilla/5.0'
 
 
 def get_page_contents(url):
     # emulate signature from browser to avoid 403
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'}
+    headers = {'User-Agent': USER_AGENT}
 
     # request the website contents
     response = requests.get(url, headers=headers)
@@ -69,6 +72,24 @@ def format_latex(title, soup):
             with doc.create(Enumerate()) as enum:
                 for li in ele.find_all('li'):
                     enum.add_item(li.text)
+        elif ele.name == 'img':
+            with doc.create(Figure(position='h!')) as fig:
+                # create tmp directory for images
+                pathlib.Path('build/images').mkdir(parents=True, exist_ok=True)
+
+                # generate image path
+                image_path = 'images/' + ele['src'].split('/')[-1]
+
+                # retrieve image
+                headers = {'User-Agent': USER_AGENT}
+                response = requests.get(ele['src'], stream=True,
+                                        headers=headers)
+                with open('build/' + image_path, 'wb') as f:
+                    response.raw.decode_content = True
+                    shutil.copyfileobj(response.raw, f)
+
+                # append image
+                fig.add_image(image_path, width='120px')
 
     return doc
 
