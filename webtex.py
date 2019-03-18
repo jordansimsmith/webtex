@@ -90,7 +90,7 @@ def format_latex(title, soup):
                     shutil.copyfileobj(response.raw, f)
 
                 # append image
-                fig.add_image(image_path, width='120px')
+                fig.add_image(image_path)
 
     return doc
 
@@ -107,7 +107,7 @@ def build_latex(title, latex):
     latex.generate_pdf('build/' + file_name, clean_tex=False)
 
 
-url = 'https://www.jpattonassociates.com/dual-track-development/'
+url = input('Please enter the full url of the website to format: \n')
 raw_content = get_page_contents(url)
 cleaned_content = clean_page(raw_content)
 soup = parse_content(cleaned_content.summary())
