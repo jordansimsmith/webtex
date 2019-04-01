@@ -77,13 +77,18 @@ def format_latex(title, soup):
                 # create tmp directory for images
                 pathlib.Path('build/images').mkdir(parents=True, exist_ok=True)
 
+                # check if source is using // shorthand for http://
+                src = ele['src']
+                if src.startswith('//'):
+                    src = 'http:' + src
+
                 # generate image path
-                image_path = 'images/' + ele['src'].split('/')[-1]
+                image_path = 'images/' + src.split('/')[-1]
 
                 # retrieve image
-                print('downloading image ' + ele['src'])
+                print('downloading image ' + src)
                 headers = {'User-Agent': USER_AGENT}
-                response = requests.get(ele['src'], stream=True,
+                response = requests.get(src, stream=True,
                                         headers=headers)
                 with open('build/' + image_path, 'wb') as f:
                     response.raw.decode_content = True
